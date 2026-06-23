@@ -1,0 +1,253 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "TM-.YYYY.-.#####",
+ "creation": "2026-06-23 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "brand_name",
+  "trade_name",
+  "trademark_class",
+  "nice_class",
+  "application_number",
+  "column_break_head",
+  "status",
+  "in_charge",
+  "followup_status",
+  "vendor_section",
+  "vendor_name",
+  "column_break_vendor",
+  "vendor_contact",
+  "dates_section",
+  "application_date",
+  "issue_date",
+  "column_break_dates",
+  "valid_till",
+  "reminders_section",
+  "enable_reminders",
+  "reminder_days_before",
+  "followups_section",
+  "follow_ups",
+  "document_section",
+  "trademark_document",
+  "notes_section",
+  "description",
+  "notes"
+ ],
+ "fields": [
+  {
+   "bold": 1,
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "label": "Brand Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "trade_name",
+   "fieldtype": "Data",
+   "label": "Trade Name"
+  },
+  {
+   "fieldname": "trademark_class",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Class / Type",
+   "options": "Compliance Category"
+  },
+  {
+   "description": "Nice Classification number (1–45), if applicable.",
+   "fieldname": "nice_class",
+   "fieldtype": "Data",
+   "label": "Class Number"
+  },
+  {
+   "fieldname": "application_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Application Number"
+  },
+  {
+   "fieldname": "column_break_head",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Filed",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Filed\nAdvertised\nRegistered\nExpired",
+   "reqd": 1
+  },
+  {
+   "fieldname": "in_charge",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "In-Charge Person",
+   "options": "User"
+  },
+  {
+   "fieldname": "followup_status",
+   "fieldtype": "Data",
+   "label": "Application & Follow-Up Status"
+  },
+  {
+   "fieldname": "vendor_section",
+   "fieldtype": "Section Break",
+   "label": "Vendor / Agent"
+  },
+  {
+   "fieldname": "vendor_name",
+   "fieldtype": "Data",
+   "label": "Vendor / Agent Name"
+  },
+  {
+   "fieldname": "column_break_vendor",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vendor_contact",
+   "fieldtype": "Data",
+   "label": "Vendor Contact",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "dates_section",
+   "fieldtype": "Section Break",
+   "label": "Dates & Validity"
+  },
+  {
+   "fieldname": "application_date",
+   "fieldtype": "Date",
+   "label": "Application Date"
+  },
+  {
+   "fieldname": "issue_date",
+   "fieldtype": "Date",
+   "label": "Registration / Issue Date"
+  },
+  {
+   "fieldname": "column_break_dates",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "valid_till",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Valid Till"
+  },
+  {
+   "fieldname": "reminders_section",
+   "fieldtype": "Section Break",
+   "label": "Reminders"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_reminders",
+   "fieldtype": "Check",
+   "label": "Enable Reminders"
+  },
+  {
+   "depends_on": "enable_reminders",
+   "description": "Comma-separated days before Valid Till, e.g. 90,60,30,15. Leave blank to inherit the Class/Type category default or the global default.",
+   "fieldname": "reminder_days_before",
+   "fieldtype": "Data",
+   "label": "Remind Before Days"
+  },
+  {
+   "fieldname": "followups_section",
+   "fieldtype": "Section Break",
+   "label": "Vendor Follow-Ups"
+  },
+  {
+   "fieldname": "follow_ups",
+   "fieldtype": "Table",
+   "label": "Follow-Ups",
+   "options": "Trademark Follow Up"
+  },
+  {
+   "fieldname": "document_section",
+   "fieldtype": "Section Break",
+   "label": "Document"
+  },
+  {
+   "fieldname": "trademark_document",
+   "fieldtype": "Attach",
+   "label": "Trademark Document"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "notes_section",
+   "fieldtype": "Section Break",
+   "label": "Description & Notes"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Notes"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-23 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Compliance Manager",
+ "name": "Trademark",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Compliance Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Compliance User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "brand_name",
+ "track_changes": 1
+}

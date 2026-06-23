@@ -1,0 +1,21 @@
+[project]
+name = "compliance_manager"
+authors = [
+    { name = "Tejas Kutnikar", email = "tjs.kutnikar@gmail.com" }
+]
+description = "Centralized tracking and reminders for organizational compliance: insurances, licences, trademarks and regulatory obligations."
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    # No hard dependency on ERPNext — this is a pure Frappe app.
+    # "frappe" is provided by the bench environment and intentionally not pinned here.
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.bench.frappe-dependencies]
+# Supports Frappe v14, v15 and v16 (develop is 17-dev at time of writing).
+frappe = ">=14.0.0,<17.0.0"

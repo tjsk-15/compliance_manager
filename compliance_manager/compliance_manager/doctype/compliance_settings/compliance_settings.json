@@ -1,0 +1,134 @@
+{
+ "actions": [],
+ "creation": "2026-06-23 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "defaults_section",
+  "default_reminder_days",
+  "auto_update_status",
+  "channels_section",
+  "send_email",
+  "send_system_notification",
+  "column_break_channels",
+  "default_cc",
+  "fallback_recipient",
+  "escalation_section",
+  "escalate_after_expiry",
+  "escalation_interval_days"
+ ],
+ "fields": [
+  {
+   "fieldname": "defaults_section",
+   "fieldtype": "Section Break",
+   "label": "Reminder Defaults"
+  },
+  {
+   "default": "30,15,7,1",
+   "description": "Global default milestones (days before the deadline). Overridden per-category and per-document when set.",
+   "fieldname": "default_reminder_days",
+   "fieldtype": "Data",
+   "label": "Default Reminder Days"
+  },
+  {
+   "default": "1",
+   "description": "Automatically flip items to Expired / Overdue once their deadline passes.",
+   "fieldname": "auto_update_status",
+   "fieldtype": "Check",
+   "label": "Auto-update Status After Deadline"
+  },
+  {
+   "fieldname": "channels_section",
+   "fieldtype": "Section Break",
+   "label": "Notification Channels"
+  },
+  {
+   "default": "1",
+   "fieldname": "send_email",
+   "fieldtype": "Check",
+   "label": "Send Email Reminders"
+  },
+  {
+   "default": "1",
+   "fieldname": "send_system_notification",
+   "fieldtype": "Check",
+   "label": "Send In-App Notifications"
+  },
+  {
+   "fieldname": "column_break_channels",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Comma-separated email addresses CC'd on every reminder.",
+   "fieldname": "default_cc",
+   "fieldtype": "Small Text",
+   "label": "Default CC Emails"
+  },
+  {
+   "description": "Notified when an item has no In-Charge person set.",
+   "fieldname": "fallback_recipient",
+   "fieldtype": "Link",
+   "label": "Fallback Recipient",
+   "options": "User"
+  },
+  {
+   "fieldname": "escalation_section",
+   "fieldtype": "Section Break",
+   "label": "Overdue Escalation"
+  },
+  {
+   "default": "0",
+   "description": "Keep sending reminders after the deadline passes until the item is renewed/closed.",
+   "fieldname": "escalate_after_expiry",
+   "fieldtype": "Check",
+   "label": "Escalate After Expiry"
+  },
+  {
+   "default": "7",
+   "depends_on": "escalate_after_expiry",
+   "description": "Send an overdue reminder every N days after the deadline.",
+   "fieldname": "escalation_interval_days",
+   "fieldtype": "Int",
+   "label": "Escalation Interval (days)"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-06-23 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Compliance Manager",
+ "name": "Compliance Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Compliance Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "print": 1,
+   "read": 1,
+   "role": "Compliance User"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

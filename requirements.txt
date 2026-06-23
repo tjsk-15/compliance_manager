@@ -1,0 +1,2 @@
+# Compliance Manager has no third-party Python dependencies beyond Frappe,
+# which is provided by the bench environment.

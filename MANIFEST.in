@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.png
+include *.txt
+recursive-include compliance_manager *.css
+recursive-include compliance_manager *.csv
+recursive-include compliance_manager *.html
+recursive-include compliance_manager *.ico
+recursive-include compliance_manager *.js
+recursive-include compliance_manager *.json
+recursive-include compliance_manager *.md
+recursive-include compliance_manager *.png
+recursive-include compliance_manager *.py
+recursive-include compliance_manager *.svg
+recursive-include compliance_manager *.txt
+recursive-exclude compliance_manager *.pyc

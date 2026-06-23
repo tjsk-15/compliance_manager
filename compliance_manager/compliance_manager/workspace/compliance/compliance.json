@@ -1,0 +1,162 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"hdr_title\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Compliance Manager</b></span>\",\"col\":12}},{\"id\":\"para_intro\",\"type\":\"paragraph\",\"data\":{\"text\":\"Track insurances, licences, trademarks and regulatory obligations \\u2014 with multi-stage renewal reminders.\",\"col\":12}},{\"id\":\"sc_ins\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Insurance Policies\",\"col\":3}},{\"id\":\"sc_lic\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Licences\",\"col\":3}},{\"id\":\"sc_tm\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Trademarks\",\"col\":3}},{\"id\":\"sc_cmp\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Compliance Records\",\"col\":3}},{\"id\":\"hdr_browse\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h6\\\"><b>Browse</b></span>\",\"col\":12}},{\"id\":\"card_trackers\",\"type\":\"card\",\"data\":{\"card_name\":\"Trackers\",\"col\":4}},{\"id\":\"card_config\",\"type\":\"card\",\"data\":{\"card_name\":\"Configuration\",\"col\":4}}]",
+ "creation": "2026-06-23 12:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "shield",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Compliance",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Trackers",
+   "link_count": 4,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Insurance Policy",
+   "link_count": 0,
+   "link_to": "Insurance Policy",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Licence",
+   "link_count": 0,
+   "link_to": "Licence",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Trademark",
+   "link_count": 0,
+   "link_to": "Trademark",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Compliance Record",
+   "link_count": 0,
+   "link_to": "Compliance Record",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Configuration",
+   "link_count": 3,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Compliance Category",
+   "link_count": 0,
+   "link_to": "Compliance Category",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Compliance Settings",
+   "link_count": 0,
+   "link_to": "Compliance Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Compliance Reminder Log",
+   "link_count": 0,
+   "link_to": "Compliance Reminder Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-06-23 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Compliance Manager",
+ "name": "Compliance",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Compliance Manager"
+  },
+  {
+   "role": "Compliance User"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 1.0,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "label": "Insurance Policies",
+   "link_to": "Insurance Policy",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Licences",
+   "link_to": "Licence",
+   "type": "DocType"
+  },
+  {
+   "color": "Purple",
+   "doc_view": "List",
+   "label": "Trademarks",
+   "link_to": "Trademark",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Compliance Records",
+   "link_to": "Compliance Record",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "",
+   "label": "Settings",
+   "link_to": "Compliance Settings",
+   "type": "DocType"
+  }
+ ],
+ "title": "Compliance",
+ "type": "Workspace"
+}
