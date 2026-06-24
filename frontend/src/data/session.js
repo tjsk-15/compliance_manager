@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import { createResource } from 'frappe-ui'
+import { createResource, call } from 'frappe-ui'
 
 // Single shared session/context store, populated once on app load.
 export const session = reactive({
@@ -27,6 +27,13 @@ export const contextResource = createResource({
   },
 })
 
-export function logout() {
-  window.location.href = '/api/method/logout'
+export async function logout() {
+  // Clear the session via the API, then land on Frappe's login page
+  // (redirect-to brings the user back to the portal after they sign in again).
+  try {
+    await call('logout')
+  } catch (e) {
+    // Session may already be gone — fall through to the redirect regardless.
+  }
+  window.location.href = '/login?redirect-to=/compliance'
 }
