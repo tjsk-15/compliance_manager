@@ -18,7 +18,7 @@ export default defineConfig({
         indexHtmlPath: path.resolve(__dirname, '../compliance_manager/www/compliance.html'),
         baseUrl: '/assets/compliance_manager/frontend/',
         emptyOutDir: true,
-        sourcemap: true,
+        sourcemap: false,
       },
     }),
     vue(),
