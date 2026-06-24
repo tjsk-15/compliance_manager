@@ -6,13 +6,13 @@
       subtitle="Reminder defaults, notification channels and compliance categories."
     />
 
-    <div v-if="!session.isManager" class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-      Settings are available to Compliance Managers only.
+    <div v-if="!session.canManageSettings && !canReadCategories" class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      You don't have permission to manage settings or categories.
     </div>
 
     <template v-else>
       <!-- Reminder & channel settings -->
-      <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <section v-if="session.canManageSettings" class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <h2 class="text-sm font-semibold text-gray-900">Reminders & notifications</h2>
         <p class="mt-0.5 text-sm text-gray-500">How and when renewal reminders are sent.</p>
 
@@ -81,13 +81,13 @@
       </section>
 
       <!-- Categories -->
-      <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <section v-if="canReadCategories" class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <div class="flex items-center justify-between border-b border-gray-100 px-5 py-3.5">
           <div>
             <h2 class="text-sm font-semibold text-gray-900">Compliance categories</h2>
             <p class="text-sm text-gray-500">Classify items and set per-category reminder defaults.</p>
           </div>
-          <Button variant="subtle" icon-left="plus" @click="openCategory()">Add category</Button>
+          <Button v-if="canCreateCategory" variant="subtle" icon-left="plus" @click="openCategory()">Add category</Button>
         </div>
 
         <div v-if="categories.loading && !catRows.length" class="flex justify-center py-10">
@@ -113,10 +113,10 @@
               <td class="px-5 py-3 text-sm text-gray-600">{{ c.default_reminder_days || '—' }}</td>
               <td class="px-5 py-3 text-right">
                 <div class="flex justify-end gap-1 opacity-0 transition group-hover:opacity-100">
-                  <button class="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-brand-600" @click="openCategory(c)">
+                  <button v-if="canWriteCategory" class="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-brand-600" @click="openCategory(c)">
                     <Icon name="edit-2" :size="15" />
                   </button>
-                  <button class="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600" @click="askDeleteCategory(c)">
+                  <button v-if="canDeleteCategory" class="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600" @click="askDeleteCategory(c)">
                     <Icon name="trash-2" :size="15" />
                   </button>
                 </div>
@@ -166,7 +166,12 @@ import FormField from '@/components/FormField.vue'
 import LinkField from '@/components/LinkField.vue'
 import Modal from '@/components/Modal.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { session } from '@/data/session'
+import { session, can } from '@/data/session'
+
+const canReadCategories = computed(() => can('Compliance Category', 'read'))
+const canCreateCategory = computed(() => can('Compliance Category', 'create'))
+const canWriteCategory = computed(() => can('Compliance Category', 'write'))
+const canDeleteCategory = computed(() => can('Compliance Category', 'delete'))
 
 const SETTINGS = 'Compliance Settings'
 const settingsFields = [
@@ -210,7 +215,7 @@ const categories = createListResource({
   fields: ['name', 'category_name', 'applies_to', 'default_reminder_days', 'disabled'],
   orderBy: 'applies_to asc',
   pageLength: 200,
-  auto: session.isManager,
+  auto: canReadCategories.value,
 })
 const catRows = computed(() => categories.data || [])
 
@@ -292,6 +297,6 @@ async function doDeleteCategory() {
 }
 
 onMounted(() => {
-  if (session.isManager) loadSettings()
+  if (session.canManageSettings) loadSettings()
 })
 </script>

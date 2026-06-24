@@ -312,5 +312,7 @@ def _get_settings():
 # Manual trigger (used by the "Run reminders now" button / API)
 # ---------------------------------------------------------------------------
 def run_now():
-    frappe.only_for(("Compliance Manager", "System Manager"))
+    # Same gate as the portal's "manager" concept: write access to settings.
+    if not frappe.has_permission("Compliance Settings", "write"):
+        frappe.throw("Not permitted to run reminders.", frappe.PermissionError)
     return run_daily_reminders()

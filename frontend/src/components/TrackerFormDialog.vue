@@ -1,7 +1,7 @@
 <template>
   <Modal
     :model-value="modelValue"
-    :title="name ? `Edit ${tracker.singular}` : `New ${tracker.singular}`"
+    :title="dialogTitle"
     :subtitle="name || 'Fill in the details below'"
     size="lg"
     @update:model-value="$emit('update:modelValue', $event)"
@@ -34,6 +34,7 @@
             :required="f.required"
             :placeholder="f.placeholder"
             :help="f.help"
+            :disabled="readOnly"
           />
           <FormField
             v-else
@@ -45,14 +46,17 @@
             :placeholder="f.placeholder"
             :help="f.help"
             :error="errors[f.field]"
+            :disabled="readOnly"
           />
         </div>
       </div>
     </template>
 
     <template #footer>
-      <Button variant="outline" @click="$emit('update:modelValue', false)">Cancel</Button>
-      <Button variant="solid" icon-left="check" :loading="saving" @click="save">
+      <Button variant="outline" @click="$emit('update:modelValue', false)">
+        {{ readOnly ? 'Close' : 'Cancel' }}
+      </Button>
+      <Button v-if="!readOnly" variant="solid" icon-left="check" :loading="saving" @click="save">
         {{ name ? 'Save changes' : `Create ${tracker.singular}` }}
       </Button>
     </template>
@@ -60,7 +64,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { call } from 'frappe-ui'
 import Modal from './Modal.vue'
 import Button from './Button.vue'
@@ -73,8 +77,14 @@ const props = defineProps({
   modelValue: Boolean,
   tracker: { type: Object, required: true },
   name: String, // present => edit mode
+  readOnly: Boolean, // view-only (user lacks write permission)
 })
 const emit = defineEmits(['update:modelValue', 'saved'])
+
+const dialogTitle = computed(() => {
+  if (!props.name) return `New ${props.tracker.singular}`
+  return props.readOnly ? `View ${props.tracker.singular}` : `Edit ${props.tracker.singular}`
+})
 
 const form = reactive({})
 const errors = reactive({})

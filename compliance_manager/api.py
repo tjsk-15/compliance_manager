@@ -11,8 +11,11 @@ from frappe.utils import add_days, date_diff, nowdate
 from compliance_manager.services import reminders
 from compliance_manager.utils.reminders_config import TRACKED_DOCTYPES
 
-COMPLIANCE_ROLES = ("Compliance Manager", "Compliance User", "System Manager")
-MANAGER_ROLES = ("Compliance Manager", "System Manager")
+# DocTypes whose Frappe permissions the portal mirrors. The UI is driven by the
+# real permission engine (frappe.has_permission) on these, so any role or
+# permission change in Role Permissions Manager flows through to the portal.
+TRACKER_DOCTYPES = list(TRACKED_DOCTYPES.keys())
+PORTAL_DOCTYPES = TRACKER_DOCTYPES + ["Compliance Category", "Compliance Settings"]
 
 # DocType <-> stable frontend key / label.
 _TRACKER_KEYS = {
@@ -30,13 +33,13 @@ _TRACKER_LABELS = {
 
 
 def has_app_permission(*args, **kwargs):
-    """Gate the app launcher tile to compliance users only.
+    """Gate the app launcher tile to users who can read any tracker.
 
     Accepts/ignores any args so it stays compatible across Frappe versions that
     may call the ``add_to_apps_screen`` permission hook with or without context.
     """
-    roles = set(frappe.get_roles())
-    return bool(roles.intersection(COMPLIANCE_ROLES))
+    user = frappe.session.user
+    return any(frappe.has_permission(dt, "read", user=user) for dt in TRACKER_DOCTYPES)
 
 
 # ---------------------------------------------------------------------------
@@ -44,17 +47,37 @@ def has_app_permission(*args, **kwargs):
 # ---------------------------------------------------------------------------
 @frappe.whitelist()
 def get_portal_context():
-    """Who is the logged-in user and what may they do. Called once on app load."""
+    """Who is the logged-in user and what may they do. Called once on app load.
+
+    Permissions are read straight from Frappe's permission engine per DocType, so
+    the portal always reflects whatever roles/permissions are configured on the
+    site — including custom roles and User Permissions — not a hardcoded list.
+    """
     user = frappe.session.user
-    roles = set(frappe.get_roles())
+    roles = sorted(frappe.get_roles())
+
+    permissions = {}
+    for dt in PORTAL_DOCTYPES:
+        permissions[dt] = {
+            "read": bool(frappe.has_permission(dt, "read", user=user)),
+            "create": bool(frappe.has_permission(dt, "create", user=user)),
+            "write": bool(frappe.has_permission(dt, "write", user=user)),
+            "delete": bool(frappe.has_permission(dt, "delete", user=user)),
+        }
+
+    can_read_tracker = any(permissions[dt]["read"] for dt in TRACKER_DOCTYPES)
+    can_manage_settings = permissions["Compliance Settings"]["write"]
+
     return {
         "user": user,
         "full_name": frappe.db.get_value("User", user, "full_name") or user,
         "user_image": frappe.db.get_value("User", user, "user_image"),
-        "roles": sorted(roles),
-        "is_manager": bool(roles.intersection(MANAGER_ROLES)),
-        "can_write": bool(roles.intersection(COMPLIANCE_ROLES)),
-        "is_compliance_user": bool(roles.intersection(COMPLIANCE_ROLES)),
+        "roles": roles,
+        # Per-DocType { read, create, write, delete } — the source of truth for the UI.
+        "permissions": permissions,
+        "is_compliance_user": can_read_tracker,
+        "can_manage_settings": can_manage_settings,
+        "is_manager": can_manage_settings or "System Manager" in roles,
     }
 
 

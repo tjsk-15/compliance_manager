@@ -2,7 +2,7 @@
   <div class="space-y-5">
     <PageHeader :icon="tracker.icon" :title="tracker.label" :subtitle="subtitle">
       <template #actions>
-        <Button v-if="session.canWrite" variant="solid" icon-left="plus" @click="openNew">
+        <Button v-if="canCreate" variant="solid" icon-left="plus" @click="openNew">
           New {{ tracker.singular }}
         </Button>
       </template>
@@ -45,7 +45,7 @@
       :title="`No ${tracker.label.toLowerCase()} yet`"
       :message="search || statusFilter !== 'All' ? 'No records match your filters.' : `Add your first ${tracker.singular.toLowerCase()} to start tracking renewals.`"
     >
-      <template v-if="session.canWrite && !search && statusFilter === 'All'" #action>
+      <template v-if="canCreate && !search && statusFilter === 'All'" #action>
         <Button variant="solid" icon-left="plus" @click="openNew">New {{ tracker.singular }}</Button>
       </template>
     </EmptyState>
@@ -54,7 +54,7 @@
       <TrackerTable
         :tracker="tracker"
         :rows="rows"
-        :can-delete="session.isManager"
+        :can-delete="canDelete"
         @edit="openEdit"
         @delete="askDelete"
       />
@@ -67,6 +67,7 @@
       v-model="formOpen"
       :tracker="tracker"
       :name="editName"
+      :read-only="!canWrite"
       @saved="onSaved"
     />
 
@@ -95,10 +96,14 @@ import TrackerTable from '@/components/TrackerTable.vue'
 import TrackerFormDialog from '@/components/TrackerFormDialog.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { getTracker } from '@/data/trackers'
-import { session } from '@/data/session'
+import { can } from '@/data/session'
 
 const route = useRoute()
 const tracker = getTracker(route.meta.tracker)
+
+const canCreate = computed(() => can(tracker.doctype, 'create'))
+const canWrite = computed(() => can(tracker.doctype, 'write'))
+const canDelete = computed(() => can(tracker.doctype, 'delete'))
 
 const search = ref('')
 const statusFilter = ref('All')

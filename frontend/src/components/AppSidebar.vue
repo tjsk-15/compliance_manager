@@ -35,7 +35,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Icon from './Icon.vue'
 import { trackerList } from '@/data/trackers'
-import { session } from '@/data/session'
+import { session, can } from '@/data/session'
 
 defineEmits(['navigate'])
 
@@ -46,10 +46,14 @@ const logoUrl = '/assets/compliance_manager/images/logo.svg'
 
 const items = computed(() => {
   const base = [{ to: '/', label: 'Dashboard', icon: 'home', exact: true }]
+  // Only show trackers the user can actually read.
   for (const t of trackerList) {
-    base.push({ to: t.path, label: t.label, icon: t.icon })
+    if (can(t.doctype, 'read')) {
+      base.push({ to: t.path, label: t.label, icon: t.icon })
+    }
   }
-  if (session.isManager) {
+  // Settings appears if the user can manage reminder settings or categories.
+  if (session.canManageSettings || can('Compliance Category', 'write')) {
     base.push({ to: '/settings', label: 'Settings', icon: 'settings' })
   }
   return base

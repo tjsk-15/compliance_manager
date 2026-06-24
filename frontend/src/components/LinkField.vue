@@ -7,7 +7,8 @@
 
     <button
       type="button"
-      :class="control"
+      :class="[control, disabled ? 'cursor-not-allowed bg-gray-50 text-gray-500' : '']"
+      :disabled="disabled"
       @click="toggle"
     >
       <span class="truncate" :class="displayLabel ? 'text-gray-900' : 'text-gray-400'">
@@ -15,13 +16,13 @@
       </span>
       <span class="ml-2 flex items-center gap-1">
         <Icon
-          v-if="modelValue"
+          v-if="modelValue && !disabled"
           name="x"
           :size="14"
           class="text-gray-400 hover:text-gray-600"
           @click.stop="clear"
         />
-        <Icon name="chevron-down" :size="16" class="text-gray-400" />
+        <Icon v-if="!disabled" name="chevron-down" :size="16" class="text-gray-400" />
       </span>
     </button>
 
@@ -74,6 +75,7 @@ const props = defineProps({
   required: Boolean,
   placeholder: String,
   help: String,
+  disabled: Boolean,
 })
 const emit = defineEmits(['update:modelValue'])
 
@@ -118,6 +120,7 @@ async function load() {
 }
 
 function toggle() {
+  if (props.disabled) return
   open.value = !open.value
   if (open.value) {
     if (!options.value.length) load()
