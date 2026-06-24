@@ -67,6 +67,59 @@ Installing seeds two roles, sensible **Compliance Settings** defaults, and a
 starter set of **Compliance Categories** (Health/Vehicle/Liability insurance,
 Tax Filing, Safety Check, ISO, etc.) so the app is usable immediately.
 
+### Build the web portal (one extra step)
+
+The friendly end-user UI is a Vue 3 single-page app under `frontend/`. Build it
+once (and after any frontend change):
+
+```bash
+cd apps/compliance_manager/frontend
+yarn install        # or: npm install
+yarn build          # outputs to ../compliance_manager/public/frontend
+                    # and generates ../compliance_manager/www/compliance.html
+cd -
+bench build --app compliance_manager
+bench --site yoursite.local clear-cache
+```
+
+For active frontend development with hot reload:
+
+```bash
+cd apps/compliance_manager/frontend
+yarn dev            # Vite dev server; proxies API calls to your bench
+```
+
+---
+
+## Web portal — `/compliance`
+
+The portal is the primary, staff-friendly way to use the app — no Desk knowledge
+required. Open **`/compliance`** (the app-launcher tile also points here).
+
+- **Dashboard** — greeting, at-a-glance counts (due in 30 days, overdue, active),
+  a card per tracker, and a unified **upcoming & overdue renewals** list.
+- **Trackers** — searchable, status-filterable lists for Insurance, Licences,
+  Trademarks and Compliance Records with inline **create / edit / delete** in a
+  clean dialog (no raw DocType form).
+- **Settings** (managers only) — reminder defaults, notification channels,
+  escalation, and full **category management**.
+- **Auth** — all staff sign in as Frappe users; unauthenticated visits bounce to
+  login and return. Users need a **Compliance User** (or Manager) role; the portal
+  shows a clear "no access yet" screen otherwise.
+- **Branding** — a "trustworthy green" theme (matches the shield logo), defined in
+  `frontend/tailwind.config.js` under the `brand` color scale. Change those hex
+  values to rebrand; drop a new `public/images/logo.svg` to swap the logo.
+- **Mobile-friendly** — responsive sidebar drawer and card layouts.
+
+Design notes: the UI uses **Frappe UI** for the data layer (`createResource`,
+`createListResource`, `call`) and self-contained, themable Vue components for the
+visuals, so the green branding is exact and the build has no fragile component
+dependencies. All four trackers are driven by one config object
+([frontend/src/data/trackers.js](compliance_manager/frontend/src/data/trackers.js)) —
+adding a tracker is a single edit there plus a registry entry in the backend.
+
+Power users / admins can still use the Desk workspace at **`/app/compliance`**.
+
 Make sure the scheduler is enabled (reminders run once daily):
 
 ```bash

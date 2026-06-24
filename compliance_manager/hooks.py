@@ -25,10 +25,20 @@ add_to_apps_screen = [
         "name": "compliance_manager",
         "logo": "/assets/compliance_manager/images/logo.svg",
         "title": "Compliance Manager",
-        "route": "/app/compliance",
+        # Opens the friendly Vue portal (power users can still use /app/compliance).
+        "route": "/compliance",
         # Only show the app launcher tile to users who hold a compliance role.
         "has_permission": "compliance_manager.api.has_app_permission",
     }
+]
+
+# ---------------------------------------------------------------------------
+# Web portal (Vue SPA served at /compliance)
+# ---------------------------------------------------------------------------
+# Deep links inside the SPA (e.g. /compliance/insurance) are all served by the
+# generated `www/compliance.html`; the Vue router takes over client-side.
+website_route_rules = [
+    {"from_route": "/compliance/<path:app_path>", "to_route": "compliance"},
 ]
 
 # ---------------------------------------------------------------------------
