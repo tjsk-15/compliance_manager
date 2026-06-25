@@ -29,7 +29,15 @@
     </p>
 
     <!-- Highlights -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <StatCard
+        label="Assigned to me"
+        :value="totals.mine"
+        icon="user"
+        accent="blue"
+        :badge="totals.mineOverdue ? `${totals.mineOverdue} overdue` : ''"
+        badge-tone="red"
+      />
       <StatCard label="Due in next 30 days" :value="totals.expiring30" icon="calendar" accent="orange" />
       <StatCard
         label="Overdue / expired"
@@ -62,7 +70,22 @@
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
       <div class="flex items-center justify-between border-b border-gray-100 px-5 py-3.5">
         <h2 class="text-sm font-semibold text-gray-900">Upcoming & overdue renewals</h2>
-        <span class="text-xs text-gray-400">next 60 days</span>
+        <div class="flex items-center gap-1 rounded-lg bg-gray-100 p-0.5 text-xs font-medium">
+          <button
+            class="rounded-md px-2.5 py-1 transition"
+            :class="!mineOnly ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'"
+            @click="setScope(false)"
+          >
+            All
+          </button>
+          <button
+            class="rounded-md px-2.5 py-1 transition"
+            :class="mineOnly ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'"
+            @click="setScope(true)"
+          >
+            Assigned to me
+          </button>
+        </div>
       </div>
 
       <div v-if="loading" class="flex justify-center py-12">
@@ -120,6 +143,12 @@ const renewals = ref([])
 const loading = ref(true)
 const runningReminders = ref(false)
 const reminderResult = ref('')
+const mineOnly = ref(false)
+
+function setScope(mine) {
+  mineOnly.value = mine
+  loadRenewals()
+}
 
 const firstName = computed(() => (session.fullName || 'there').split(' ')[0])
 const today = computed(() =>
@@ -138,6 +167,8 @@ const totals = computed(() => {
     expiring30: vals.reduce((s, v) => s + (v.expiring_30d || 0), 0),
     overdue: vals.reduce((s, v) => s + (v.overdue || 0), 0),
     tracked: vals.reduce((s, v) => s + (v.total || 0), 0),
+    mine: vals.reduce((s, v) => s + (v.mine || 0), 0),
+    mineOverdue: vals.reduce((s, v) => s + (v.mine_overdue || 0), 0),
   }
 })
 
@@ -178,12 +209,30 @@ async function runReminders() {
   }
 }
 
+async function loadRenewals() {
+  loading.value = true
+  try {
+    renewals.value =
+      (await call('compliance_manager.api.get_upcoming_renewals', {
+        days: 60,
+        include_overdue: 1,
+        mine: mineOnly.value ? 1 : 0,
+      })) || []
+  } finally {
+    loading.value = false
+  }
+}
+
 async function load() {
   loading.value = true
   try {
     const [s, r] = await Promise.all([
       call('compliance_manager.api.get_expiry_summary'),
-      call('compliance_manager.api.get_upcoming_renewals', { days: 60, include_overdue: 1 }),
+      call('compliance_manager.api.get_upcoming_renewals', {
+        days: 60,
+        include_overdue: 1,
+        mine: mineOnly.value ? 1 : 0,
+      }),
     ])
     summary.value = s || {}
     renewals.value = r || []

@@ -91,9 +91,10 @@ def get_expiry_summary():
     today = nowdate()
     in_30 = add_days(today, 30)
     in_7 = add_days(today, 7)
+    user = frappe.session.user
     summary = {}
     for doctype, meta in TRACKED_DOCTYPES.items():
-        df, sf = meta["date_field"], meta["status_field"]
+        df, sf, of = meta["date_field"], meta["status_field"], meta["owner_field"]
         active = meta["active_statuses"]
         expired_status = meta["expired_status"]
 
@@ -102,6 +103,12 @@ def get_expiry_summary():
         overdue = frappe.db.count(
             doctype, {df: ["<", today], sf: ["in", active]}
         ) + frappe.db.count(doctype, {sf: expired_status})
+
+        # Records the logged-in user is In-Charge of.
+        mine = frappe.db.count(doctype, {of: user})
+        mine_overdue = frappe.db.count(
+            doctype, {of: user, df: ["<", today], sf: ["in", active]}
+        ) + frappe.db.count(doctype, {of: user, sf: expired_status})
 
         summary[_TRACKER_KEYS[doctype]] = {
             "doctype": doctype,
@@ -117,16 +124,22 @@ def get_expiry_summary():
                 doctype, {df: ["between", [today, in_30]], sf: ["in", active]}
             ),
             "overdue": overdue,
+            "mine": mine,
+            "mine_overdue": mine_overdue,
         }
     return summary
 
 
 @frappe.whitelist()
-def get_upcoming_renewals(days=60, include_overdue=1, limit=100):
-    """Unified, date-sorted list of renewals across every tracker (for the dashboard)."""
+def get_upcoming_renewals(days=60, include_overdue=1, limit=100, mine=0):
+    """Unified, date-sorted list of renewals across every tracker (for the dashboard).
+
+    Pass ``mine=1`` to restrict to records the logged-in user is In-Charge of.
+    """
     days = int(days)
     include_overdue = int(include_overdue)
     limit = int(limit)
+    mine = int(mine)
     today = nowdate()
     upto = add_days(today, days)
     start = "1900-01-01" if include_overdue else today
@@ -135,12 +148,15 @@ def get_upcoming_renewals(days=60, include_overdue=1, limit=100):
     for doctype, meta in TRACKED_DOCTYPES.items():
         df, sf, tf = meta["date_field"], meta["status_field"], meta["title_field"]
         statuses = meta["active_statuses"] + [meta["expired_status"]]
+        filters = {
+            df: ["between", [start, upto]],
+            sf: ["in", statuses],
+        }
+        if mine:
+            filters[meta["owner_field"]] = frappe.session.user
         for r in frappe.get_all(
             doctype,
-            filters={
-                df: ["between", [start, upto]],
-                sf: ["in", statuses],
-            },
+            filters=filters,
             fields=[
                 "name",
                 f"`{tf}` as title",
