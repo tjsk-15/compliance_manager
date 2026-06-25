@@ -8,15 +8,20 @@
         </h1>
         <p class="mt-0.5 text-sm text-gray-500">{{ today }} · here's what needs your attention.</p>
       </div>
-      <Button
-        v-if="session.isManager"
-        variant="outline"
-        icon-left="bell"
-        :loading="runningReminders"
-        @click="runReminders"
-      >
-        Run reminders now
-      </Button>
+      <div class="flex items-center gap-2">
+        <Button variant="ghost" icon-left="refresh-cw" :loading="loading" @click="load">
+          Refresh
+        </Button>
+        <Button
+          v-if="session.isManager"
+          variant="outline"
+          icon-left="bell"
+          :loading="runningReminders"
+          @click="runReminders"
+        >
+          Run reminders now
+        </Button>
+      </div>
     </div>
 
     <p v-if="reminderResult" class="rounded-lg bg-brand-50 px-3 py-2 text-sm text-brand-700">
@@ -32,7 +37,7 @@
         icon="alert-triangle"
         accent="red"
       />
-      <StatCard label="Active items tracked" :value="totals.active" icon="check-circle" accent="brand" />
+      <StatCard label="Items tracked" :value="totals.tracked" icon="check-circle" accent="brand" />
     </div>
 
     <!-- Per-tracker -->
@@ -43,7 +48,7 @@
           v-for="t in trackerList"
           :key="t.key"
           :label="t.label"
-          :value="summary[t.key]?.active ?? 0"
+          :value="summary[t.key]?.total ?? 0"
           :icon="t.icon"
           :accent="t.accent === 'brand' ? 'brand' : t.accent"
           :to="t.path"
@@ -132,7 +137,7 @@ const totals = computed(() => {
   return {
     expiring30: vals.reduce((s, v) => s + (v.expiring_30d || 0), 0),
     overdue: vals.reduce((s, v) => s + (v.overdue || 0), 0),
-    active: vals.reduce((s, v) => s + (v.active || 0), 0),
+    tracked: vals.reduce((s, v) => s + (v.total || 0), 0),
   }
 })
 

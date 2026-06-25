@@ -83,7 +83,11 @@ def get_portal_context():
 
 @frappe.whitelist()
 def get_expiry_summary():
-    """Per-tracker counts powering the dashboard stat cards."""
+    """Per-tracker counts powering the dashboard stat cards.
+
+    Counts are date-driven so they're accurate regardless of whether the daily
+    scheduler has run (i.e. before statuses are auto-flipped to Expired/Overdue).
+    """
     today = nowdate()
     in_30 = add_days(today, 30)
     in_7 = add_days(today, 7)
@@ -91,10 +95,19 @@ def get_expiry_summary():
     for doctype, meta in TRACKED_DOCTYPES.items():
         df, sf = meta["date_field"], meta["status_field"]
         active = meta["active_statuses"]
+        expired_status = meta["expired_status"]
+
+        # Overdue = open items already past their deadline (not yet renewed/closed)
+        # PLUS items already marked expired/overdue. Independent of the scheduler.
+        overdue = frappe.db.count(
+            doctype, {df: ["<", today], sf: ["in", active]}
+        ) + frappe.db.count(doctype, {sf: expired_status})
+
         summary[_TRACKER_KEYS[doctype]] = {
             "doctype": doctype,
             "key": _TRACKER_KEYS[doctype],
             "label": _TRACKER_LABELS[doctype],
+            # Every record in the tracker — what "documents created" means.
             "total": frappe.db.count(doctype),
             "active": frappe.db.count(doctype, {sf: ["in", active]}),
             "expiring_7d": frappe.db.count(
@@ -103,7 +116,7 @@ def get_expiry_summary():
             "expiring_30d": frappe.db.count(
                 doctype, {df: ["between", [today, in_30]], sf: ["in", active]}
             ),
-            "overdue": frappe.db.count(doctype, {sf: meta["expired_status"]}),
+            "overdue": overdue,
         }
     return summary
 
@@ -121,11 +134,12 @@ def get_upcoming_renewals(days=60, include_overdue=1, limit=100):
     rows = []
     for doctype, meta in TRACKED_DOCTYPES.items():
         df, sf, tf = meta["date_field"], meta["status_field"], meta["title_field"]
+        statuses = meta["active_statuses"] + [meta["expired_status"]]
         for r in frappe.get_all(
             doctype,
             filters={
                 df: ["between", [start, upto]],
-                sf: ["in", meta["active_statuses"]],
+                sf: ["in", statuses],
             },
             fields=[
                 "name",
