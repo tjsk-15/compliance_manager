@@ -27,6 +27,9 @@
     <p v-if="reminderResult" class="rounded-lg bg-brand-50 px-3 py-2 text-sm text-brand-700">
       {{ reminderResult }}
     </p>
+    <p v-if="loadError" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+      {{ loadError }}
+    </p>
 
     <!-- Highlights -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -144,10 +147,13 @@ const loading = ref(true)
 const runningReminders = ref(false)
 const reminderResult = ref('')
 const mineOnly = ref(false)
+const loadError = ref('')
 
-function setScope(mine) {
+async function setScope(mine) {
   mineOnly.value = mine
-  loadRenewals()
+  loading.value = true
+  await loadRenewals()
+  loading.value = false
 }
 
 const firstName = computed(() => (session.fullName || 'there').split(' ')[0])
@@ -210,7 +216,6 @@ async function runReminders() {
 }
 
 async function loadRenewals() {
-  loading.value = true
   try {
     renewals.value =
       (await call('compliance_manager.api.get_upcoming_renewals', {
@@ -218,27 +223,25 @@ async function loadRenewals() {
         include_overdue: 1,
         mine: mineOnly.value ? 1 : 0,
       })) || []
-  } finally {
-    loading.value = false
+  } catch (e) {
+    loadError.value = 'Could not load renewals: ' + (e?.message || e)
   }
 }
 
+async function loadSummary() {
+  try {
+    summary.value = (await call('compliance_manager.api.get_expiry_summary')) || {}
+  } catch (e) {
+    loadError.value = 'Could not load counts: ' + (e?.message || e)
+  }
+}
+
+// Load the two independently so one failing call can't blank the other.
 async function load() {
   loading.value = true
-  try {
-    const [s, r] = await Promise.all([
-      call('compliance_manager.api.get_expiry_summary'),
-      call('compliance_manager.api.get_upcoming_renewals', {
-        days: 60,
-        include_overdue: 1,
-        mine: mineOnly.value ? 1 : 0,
-      }),
-    ])
-    summary.value = s || {}
-    renewals.value = r || []
-  } finally {
-    loading.value = false
-  }
+  loadError.value = ''
+  await Promise.allSettled([loadSummary(), loadRenewals()])
+  loading.value = false
 }
 
 onMounted(load)

@@ -146,32 +146,43 @@ def get_upcoming_renewals(days=60, include_overdue=1, limit=100, mine=0):
 
     rows = []
     for doctype, meta in TRACKED_DOCTYPES.items():
-        df, sf, tf = meta["date_field"], meta["status_field"], meta["title_field"]
+        df, sf, tf, of = (
+            meta["date_field"],
+            meta["status_field"],
+            meta["title_field"],
+            meta["owner_field"],
+        )
         statuses = meta["active_statuses"] + [meta["expired_status"]]
         filters = {
             df: ["between", [start, upto]],
             sf: ["in", statuses],
         }
         if mine:
-            filters[meta["owner_field"]] = frappe.session.user
-        for r in frappe.get_all(
+            filters[of] = frappe.session.user
+
+        # Fetch real field names and remap in Python — avoids SQL "as" aliases,
+        # which Frappe's field validation can reject.
+        for d in frappe.get_all(
             doctype,
             filters=filters,
-            fields=[
-                "name",
-                f"`{tf}` as title",
-                f"`{df}` as date",
-                f"`{sf}` as status",
-                f"`{meta['owner_field']}` as in_charge",
-            ],
-            order_by=f"`{df}` asc",
+            fields=["name", tf, df, sf, of],
+            order_by=f"{df} asc",
             limit=limit,
         ):
-            r["doctype"] = doctype
-            r["tracker"] = _TRACKER_KEYS[doctype]
-            r["tracker_label"] = _TRACKER_LABELS[doctype]
-            r["days_left"] = date_diff(r["date"], today) if r["date"] else None
-            rows.append(r)
+            date_val = d.get(df)
+            rows.append(
+                {
+                    "doctype": doctype,
+                    "name": d.get("name"),
+                    "title": d.get(tf),
+                    "date": date_val,
+                    "status": d.get(sf),
+                    "in_charge": d.get(of),
+                    "tracker": _TRACKER_KEYS[doctype],
+                    "tracker_label": _TRACKER_LABELS[doctype],
+                    "days_left": date_diff(date_val, today) if date_val else None,
+                }
+            )
 
     rows.sort(key=lambda x: (x["date"] or "9999-12-31"))
     return rows[:limit]
